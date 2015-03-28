@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-# Input numbers
+# Input numbers, respond to number of dominant, mixed and recessive specimen
 # Given to be positive integers
 k, m, n = 2, 2, 2
-gene_pool = {"DD":k, "DR":m, "RR":n}
+
+def make_gene_pool(dominant, mixed, recessive):
+	return {"DD":dominant, "DR":mixed, "RR":recessive}
 
 def recessive_heritage_chance(parent_genotype) :
 	return float(parent_genotype.count('R')) / len(parent_genotype)
@@ -26,9 +28,9 @@ def get_variants(gene_pool):
 			variants[genotype] = (chance, reduced_pool)
 	return variants
 
-def count_total_dominant_chance():
+def count_total_dominant_chance(dominant, mixed, recessive):
 	dominant_chance = 0.0
-	variants = get_variants(gene_pool)
+	variants = get_variants(make_gene_pool(dominant, mixed, recessive))
 	for genotype1 in variants.keys():
 		mate_variants = get_variants(variants[genotype1][1])
 		for genotype2 in mate_variants.keys():
@@ -37,6 +39,6 @@ def count_total_dominant_chance():
 	return dominant_chance
 
 def main():
-	print(count_total_dominant_chance())
+	print(count_total_dominant_chance(k, m, n))
 
 main()
