@@ -1,46 +1,51 @@
 #!/usr/bin/env python3
 
-def longest_common_subsequence(str1, str2):
-	strings_not_lists = None
-	if isinstance(str1, str) and isinstance(str2, str):
-		strings_not_lists = True
-	elif isinstance(str1, list) and isinstance(str2, list):
-		strings_not_lists = False
-#	assert strings_not_lists == True or strings_not_lists == False
-	assert strings_not_lists == True
-		
-	# Initiate results table
-	l1, l2 = len(str1), len(str2)
-	tmp, results_table = [], []
-	for i in range(l2 + 1):
-		tmp.append(0)
-	for i in range(l1 + 1):
-		results_table.append(tmp[:])
+def longest_increasing_subsequence(seq):
+# It may be optimised not to store the whole pretendent bodies
+	pretendent_tails_indexes = [''] # [i] is the least possible tail of sub of len i
+	pretendent_bodies = [[]] # [i] is the body of pretendent of len i
+	def upgrade_pretendent(length, element):
+		if len(pretendent_tails_indexes) <= length + 1:
+			pretendent_tails_indexes.append(0)
+			pretendent_bodies.append(0)
+		pretendent_tails_indexes[length + 1] = element
+		pretendent_bodies[length + 1] = list(pretendent_bodies[length])
+		pretendent_bodies[length + 1].append(seq[element])
 
-	def longest(str1, str2):
-		return str1 if len(str1) > len(str2) else str2
+	def find_element_to_upgrade_with(element): # Finds largest i that seq[pti[i]] < elem
+		for i in range(1, len(pretendent_tails_indexes),)[::-1]:
+			if seq[pretendent_tails_indexes[i]] < element:
+				return i
+		return 0
 
-	# Recursive search, results are cached in results_table
-	def LCS(str1, str2):
-		l1, l2 = len(str1), len(str2)
-		if results_table[l1][l2] != 0:
-			return results_table[l1][l2]
-		if 0 == l1 or 0 == l2:
-			results_table[l1][l2] = '' if strings_not_lists else []
-			return results_table[l1][l2]
-		if str1[-1] == str2[-1]:
-			results_table[l1][l2] = LCS(str1[:-1], str2[:-1]) + str1[-1]
-			return results_table[l1][l2]
-		else:
-			results_table[l1][l2] = longest(LCS(str1, str2[:-1]), LCS(str1[:-1], str2))
-			return results_table[l1][l2]
+	pretendent_tails_indexes.append(0)
+	pretendent_bodies.append([seq[0]])
+	for i in range(1, len(seq)):
+		index = find_element_to_upgrade_with(seq[i])
+		upgrade_pretendent(index, i)
+	return pretendent_bodies[-1]
+# end of longest_increasing_subsequence
 
-	return LCS(str1, str2)
+def read_sequence(input_file):
+	n = int(input_file.readline().strip())
+	seq = list(map(int, input_file.readline().strip().split()))
+	assert len(seq) == n
+	return seq
+
+def print_seq(seq, output_file):
+	print(''.join(str(elem) + ' ' for elem in seq), file=output_file)
+
+def invapply(func, seq):
+	n = len(seq)
+	def inv(seq):
+		return map(lambda x: n - x, seq)
+	return list(inv(func(list(inv(seq)))))
 
 def main():
-	
-	str1 = "AGCATC"#AGCAT
-	str2 = "GAC"
-	print(longest_common_subsequence(str1, str2))
+	with open("Input.txt", "r") as input_file:
+		seq = read_sequence(input_file)
+		with open("Output.txt", "w") as output_file:
+			print_seq(longest_increasing_subsequence(seq), output_file)
+			print_seq(invapply(longest_increasing_subsequence, seq), output_file)
 
 main()
