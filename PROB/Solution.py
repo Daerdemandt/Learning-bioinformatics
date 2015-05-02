@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 from math import log10
 
-def get_string_probability_lg(string, gc_count):
-	char_prob = {'A' : (1 - gc_count) / 2, 'T' : (1 - gc_count) / 2, 'C' : gc_count / 2, 'G' : gc_count / 2}
-	exact_prob_lgs = [log10(char_prob[char]) for char in string]
-	return sum(exact_prob_lgs)
+def get_string_probability_lg(string, gc):
+	gc_count = string.count('G') + string.count('C')
+	gc_log, at_log = log10(gc/2), log10((1 - gc)/2)
+	return gc_count * gc_log + (len(string) - gc_count) * at_log
 	
 
 def main():
